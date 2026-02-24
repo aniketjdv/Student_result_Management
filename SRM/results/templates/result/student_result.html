@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Results{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Academic Results</h2>
+            <p class="text-muted">
+                {{ student.user.get_full_name }} | {{ student.enrollment_number }}<br>
+                {{ student.program.name }}
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h6 class="mb-1">Cumulative CGPA</h6>
+                    <h2 class="mb-0">{{ cgpa }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-2">Total Semesters</h6>
+                    <h3 class="mb-0">{{ stats.total_semesters }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-2">Total Subjects</h6>
+                    <h3 class="mb-0">{{ stats.total_subjects }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-2">Passed</h6>
+                    <h3 class="mb-0 text-success">{{ stats.passed_subjects }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-2">Failed</h6>
+                    <h3 class="mb-0 text-danger">{{ stats.failed_subjects }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Semester Results -->
+    {% for result in semester_results %}
+    <div class="card mb-3">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-0">
+                        Semester {{ result.semester }} - {{ result.academic_year }}
+                    </h5>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="badge bg-primary me-2">SGPA: {{ result.sgpa }}</span>
+                    <span class="badge bg-info me-2">{{ result.percentage }}%</span>
+                    {% if result.is_published %}
+                        <span class="badge bg-success">Published</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th>Subject Code</th>
+                            <th>Subject Name</th>
+                            <th>Credits</th>
+                            <th>Internal</th>
+                            <th>External</th>
+                            <th>Total</th>
+                            <th>Grade</th>
+                            <th>Grade Point</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mark in result.subject_marks.all %}
+                        <tr>
+                            <td><strong>{{ mark.subject.code }}</strong></td>
+                            <td>{{ mark.subject.name }}</td>
+                            <td>{{ mark.subject.credits }}</td>
+                            <td>{{ mark.internal_marks }}</td>
+                            <td>{{ mark.external_marks }}</td>
+                            <td><strong>{{ mark.total_marks }}</strong></td>
+                            <td>
+                                <span class="badge 
+                                    {% if mark.grade == 'O' %}bg-success
+                                    {% elif mark.grade == 'A+' or mark.grade == 'A' %}bg-primary
+                                    {% elif mark.grade == 'B+' or mark.grade == 'B' %}bg-info
+                                    {% elif mark.grade == 'C' or mark.grade == 'P' %}bg-warning
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ mark.grade }}
+                                </span>
+                            </td>
+                            <td>{{ mark.grade_point }}</td>
+                            <td>
+                                {% if mark.is_passed %}
+                                    <span class="badge bg-success">Pass</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Fail</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <p class="mb-1">
+                        <strong>Total Credits:</strong> {{ result.total_credits }} | 
+                        <strong>Credits Earned:</strong> {{ result.credits_earned }} |
+                        <strong>Subjects:</strong> {{ result.total_subjects }} |
+                        <strong>Passed:</strong> <span class="text-success">{{ result.passed_subjects }}</span> |
+                        <strong>Failed:</strong> <span class="text-danger">{{ result.failed_subjects }}</span>
+                    </p>
+                    {% if result.remarks %}
+                    <p class="mb-0"><strong>Remarks:</strong> {{ result.remarks }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No Results Published Yet</h5>
+            <p>Your results will appear here once they are published by the administration.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Programs Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Programs Management</h2>
+            <p class="text-muted">Manage graduate programs</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{% url 'program_add' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add New Program
+            </a>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon bg-primary text-white me-3">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Total Programs</h6>
+                            <h3 class="mb-0">{{ total_programs }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon bg-success text-white me-3">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Active Programs</h6>
+                            <h3 class="mb-0">{{ active_programs }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Programs Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Program Name</th>
+                            <th>Duration</th>
+                            <th>Semesters</th>
+                            <th>Subjects</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for program in programs %}
+                        <tr>
+                            <td>
+                                <strong>{{ program.name }}</strong>
+                            </td>
+                            <td>{{ program.duration_years }} Years</td>
+                            <td>{{ program.total_semesters }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ program.subject_count }} Total</span>
+                                <span class="badge bg-success">{{ program.active_subject_count }} Active</span>
+                            </td>
+                            <td>
+                                {% if program.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'program_detail' program.pk %}" 
+                                       class="btn btn-sm btn-outline-primary" 
+                                       title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'program_edit' program.pk %}" 
+                                       class="btn btn-sm btn-outline-warning" 
+                                       title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'program_toggle_status' program.pk %}" 
+                                       class="btn btn-sm btn-outline-info" 
+                                       title="Toggle Status">
+                                        <i class="fas fa-toggle-on"></i>
+                                    </a>
+                                    <a href="{% url 'program_delete' program.pk %}" 
+                                       class="btn btn-sm btn-outline-danger" 
+                                       title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                No programs found. <a href="{% url 'program_add' %}">Add your first program</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}

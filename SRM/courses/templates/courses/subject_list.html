@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Subjects Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Subjects Management</h2>
+            <p class="text-muted">Manage subjects across all programs</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{% url 'subject_add' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add New Subject
+            </a>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Program</label>
+                    <select name="program" class="form-select">
+                        <option value="">All Programs</option>
+                        {% for program in programs %}
+                        <option value="{{ program.id }}" {% if selected_program == program.id|stringformat:"s" %}selected{% endif %}>
+                            {{ program.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Semester</label>
+                    <select name="semester" class="form-select">
+                        <option value="">All Semesters</option>
+                        {% for sem in semesters %}
+                        <option value="{{ sem }}" {% if selected_semester == sem|stringformat:"s" %}selected{% endif %}>
+                            Semester {{ sem }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter me-2"></i>Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Subjects Table -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title mb-3">
+                Subjects List 
+                <span class="badge bg-primary">{{ total_subjects }} Total</span>
+                <span class="badge bg-success">{{ active_subjects }} Active</span>
+            </h5>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Subject Name</th>
+                            <th>Program</th>
+                            <th>Semester</th>
+                            <th>Credits</th>
+                            <th>Max Marks</th>
+                            <th>Passing Marks</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subject in subjects %}
+                        <tr>
+                            <td><strong>{{ subject.code }}</strong></td>
+                            <td>{{ subject.name }}</td>
+                            <td>
+                                <span class="badge bg-primary">{{ subject.program.name }}</span>
+                            </td>
+                            <td>{{ subject.semester }}</td>
+                            <td>{{ subject.credits }}</td>
+                            <td>{{ subject.max_marks }}</td>
+                            <td>{{ subject.passing_marks }}</td>
+                            <td>
+                                {% if subject.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'subject_detail' subject.pk %}" 
+                                       class="btn btn-sm btn-outline-primary" 
+                                       title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'subject_edit' subject.pk %}" 
+                                       class="btn btn-sm btn-outline-warning" 
+                                       title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'subject_toggle_status' subject.pk %}" 
+                                       class="btn btn-sm btn-outline-info" 
+                                       title="Toggle Status">
+                                        <i class="fas fa-toggle-on"></i>
+                                    </a>
+                                    <a href="{% url 'subject_delete' subject.pk %}" 
+                                       class="btn btn-sm btn-outline-danger" 
+                                       title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">
+                                No subjects found. <a href="{% url 'subject_add' %}">Add your first subject</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}

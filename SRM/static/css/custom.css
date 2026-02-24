@@ -1,0 +1,66 @@
+:root {
+    --primary-color: #6366f1;
+    --secondary-color: #8b5cf6;
+    --dark-bg: #1e1b4b;
+    --light-bg: #f8f9fa;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+}
+
+.navbar {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card {
+    padding: 1.5rem;
+    background: white;
+}
+
+.stat-card .icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.badge {
+    padding: 0.5em 1em;
+    border-radius: 20px;
+}

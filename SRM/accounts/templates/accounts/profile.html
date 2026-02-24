@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-4">
+            <!-- Profile Card -->
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Profile" class="rounded-circle mb-3" width="150" height="150" style="object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px; font-size: 48px;">
+                            {{ user.first_name.0|upper }}{{ user.last_name.0|upper }}
+                        </div>
+                    {% endif %}
+                    
+                    <h4>{{ user.get_full_name }}</h4>
+                    <p class="text-muted">@{{ user.username }}</p>
+                    
+                    <span class="badge bg-primary mb-3">{{ user.get_role_display }}</span>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'profile_edit' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i>Edit Profile
+                        </a>
+                        <a href="{% url 'change_password' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Profile Info -->
+            {% if profile %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">{{ user.get_role_display }} Information</h6>
+                </div>
+                <div class="card-body">
+                    {% if user.is_student %}
+                        <p><strong>Enrollment:</strong> {{ profile.enrollment_number }}</p>
+                        <p><strong>Program:</strong> {{ profile.program.name }}</p>
+                        <p><strong>Semester:</strong> {{ profile.current_semester }}</p>
+                        <p><strong>CGPA:</strong> {{ profile.cgpa }}</p>
+                    {% elif user.is_teacher %}
+                        <p><strong>Employee ID:</strong> {{ profile.employee_id }}</p>
+                        <p><strong>Department:</strong> {{ profile.department }}</p>
+                        <p><strong>Designation:</strong> {{ profile.designation }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-8">
+            <!-- Personal Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Email:</strong></div>
+                        <div class="col-sm-8">{{ user.email }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Phone:</strong></div>
+                        <div class="col-sm-8">{{ user.phone|default:"Not provided" }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Date of Birth:</strong></div>
+                        <div class="col-sm-8">{{ user.date_of_birth|default:"Not provided" }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Address:</strong></div>
+                        <div class="col-sm-8">{{ user.address|default:"Not provided" }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Member Since:</strong></div>
+                        <div class="col-sm-8">{{ user.date_joined|date:"F d, Y" }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Last Login:</strong></div>
+                        <div class="col-sm-8">{{ user.last_login|date:"F d, Y, g:i A" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Login Activity -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Login Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>IP Address</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for login in recent_logins %}
+                                <tr>
+                                    <td>{{ login.login_time|date:"M d, Y g:i A" }}</td>
+                                    <td>{{ login.ip_address }}</td>
+                                    <td>
+                                        {% if login.logout_time %}
+                                            {{ login.logout_time|timesince:login.login_time }}
+                                        {% else %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No login history available</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}

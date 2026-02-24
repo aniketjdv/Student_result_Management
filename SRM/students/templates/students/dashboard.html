@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Welcome, {{ student.user.get_full_name }}!</h2>
+            <p class="text-muted">
+                {{ student.enrollment_number }} | {{ student.program.name }} | Semester {{ student.current_semester }}
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if student.photo %}
+                <img src="{{ student.photo.url }}" alt="Profile" 
+                     class="rounded-circle" width="80" height="80" style="object-fit: cover;">
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-2x mb-2"></i>
+                    <h6>Current CGPA</h6>
+                    <h2>{{ cgpa }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-award fa-2x mb-2"></i>
+                    <h6>Current SGPA</h6>
+                    <h2>{{ current_sgpa|default:"N/A" }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                    <h6>Attendance</h6>
+                    <h2>{{ overall_attendance }}%</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-2x mb-2"></i>
+                    <h6>Credits Earned</h6>
+                    <h2>{{ total_credits }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="{% url 'student_results' %}" class="btn btn-primary w-100">
+                                <i class="fas fa-file-alt me-2"></i>View Results
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'student_performance' %}" class="btn btn-success w-100">
+                                <i class="fas fa-chart-bar me-2"></i>Performance Analytics
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'student_attendance' %}" class="btn btn-warning w-100">
+                                <i class="fas fa-calendar-check me-2"></i>View Attendance
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'student_fees_view' %}" class="btn btn-info w-100">
+                                <i class="fas fa-dollar-sign me-2"></i>Fee Records
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Current Semester Info -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Latest Result</h5>
+                </div>
+                <div class="card-body">
+                    {% if latest_result %}
+                        <p><strong>Semester:</strong> {{ latest_result.semester }}</p>
+                        <p><strong>SGPA:</strong> {{ latest_result.sgpa }}</p>
+                        <p><strong>Percentage:</strong> {{ latest_result.percentage }}%</p>
+                        <p><strong>Status:</strong> 
+                            {% if latest_result.is_published %}
+                                <span class="badge bg-success">Published</span>
+                            {% else %}
+                                <span class="badge bg-warning">Not Published</span>
+                            {% endif %}
+                        </p>
+                    {% else %}
+                        <p class="text-muted">No results published yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Current Semester Attendance</h5>
+                </div>
+                <div class="card-body">
+                    {% if attendance_records %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for att in attendance_records %}
+                                    <tr>
+                                        <td>{{ att.subject.code }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar 
+                                                    {% if att.percentage >= 75 %}bg-success
+                                                    {% elif att.percentage >= 60 %}bg-warning
+                                                    {% else %}bg-danger{% endif %}" 
+                                                    style="width: {{ att.percentage }}%">
+                                                    {{ att.percentage }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No attendance records available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if pending_fees > 0 %}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                You have <strong>{{ pending_fees }}</strong> pending fee(s). 
+                <a href="{% url 'student_fees_view' %}" class="alert-link">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+.stat-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+</style>
+{% endblock %}

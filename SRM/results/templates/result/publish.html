@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Publish Results{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Publish Results</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Publish New Results</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.semester.label }}</label>
+                            {{ form.semester }}
+                            {% if form.semester.errors %}
+                                <div class="text-danger small">{{ form.semester.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.academic_year.label }}</label>
+                            {{ form.academic_year }}
+                            {% if form.academic_year.errors %}
+                                <div class="text-danger small">{{ form.academic_year.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.program.label }}</label>
+                            {{ form.program }}
+                            {% if form.program.errors %}
+                                <div class="text-danger small">{{ form.program.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.remarks.label }}</label>
+                            {{ form.remarks }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check-circle me-2"></i>Publish Results
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Unpublished Results</h5>
+                </div>
+                <div class="card-body">
+                    {% if unpublished %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Semester</th>
+                                        <th>Year</th>
+                                        <th>Program</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in unpublished %}
+                                    <tr>
+                                        <td>{{ item.semester }}</td>
+                                        <td>{{ item.academic_year }}</td>
+                                        <td>{{ item.student__program__name }}</td>
+                                        <td><span class="badge bg-warning">{{ item.count }}</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">
+                            <i class="fas fa-check-circle fa-2x mb-2"></i><br>
+                            All results are published!
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}

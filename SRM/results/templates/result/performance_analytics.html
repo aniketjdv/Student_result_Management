@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Performance Analytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h2 class="mb-4">Performance Analytics</h2>
+    
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">CGPA</h6>
+                    <h2 class="text-primary" id="cgpa-display">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Subjects</h6>
+                    <h2 id="total-subjects">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Passed</h6>
+                    <h2 class="text-success" id="passed-subjects">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Pass Rate</h6>
+                    <h2 id="pass-rate">-</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Academic Progress (SGPA)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="sgpaChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Grade Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="gradeChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Subject Performance (Current Semester)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="subjectChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Attendance Overview</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const performanceData = {{ performance_data|safe }};
+
+// Update summary cards
+document.getElementById('cgpa-display').textContent = performanceData.cgpa.toFixed(2);
+document.getElementById('total-subjects').textContent = performanceData.summary.total_subjects;
+document.getElementById('passed-subjects').textContent = performanceData.summary.passed_subjects;
+document.getElementById('pass-rate').textContent = performanceData.summary.pass_percentage.toFixed(1) + '%';
+
+// SGPA Progress Chart
+const sgpaCtx = document.getElementById('sgpaChart').getContext('2d');
+new Chart(sgpaCtx, {
+    type: 'line',
+    data: {
+        labels: performanceData.sgpa_data.map(d => d.semester),
+        datasets: [{
+            label: 'SGPA',
+            data: performanceData.sgpa_data.map(d => d.sgpa),
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 5,
+            pointHoverRadius: 7
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: true }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 10,
+                title: { display: true, text: 'SGPA' }
+            }
+        }
+    }
+});
+
+// Subject Performance Chart
+const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+new Chart(subjectCtx, {
+    type: 'bar',
+    data: {
+        labels: performanceData.subject_performance.map(d => d.subject),
+        datasets: [{
+            label: 'Percentage',
+            data: performanceData.subject_performance.map(d => d.percentage),
+            backgroundColor: '#8b5cf6',
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: true }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                title: { display: true, text: 'Percentage' }
+            }
+        }
+    }
+});
+
+// Attendance Chart
+const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+new Chart(attendanceCtx, {
+    type: 'bar',
+    data: {
+        labels: performanceData.attendance_data.map(d => d.subject),
+        datasets: [{
+            label: 'Attendance %',
+            data: performanceData.attendance_data.map(d => d.percentage),
+            backgroundColor: '#10b981',
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                title: { display: true, text: 'Attendance %' }
+            }
+        }
+    }
+});
+
+// Grade Distribution Chart
+const gradeCtx = document.getElementById('gradeChart').getContext('2d');
+new Chart(gradeCtx, {
+    type: 'doughnut',
+    data: {
+        labels: performanceData.grade_distribution.map(d => d.grade),
+        datasets: [{
+            data: performanceData.grade_distribution.map(d => d.count),
+            backgroundColor: [
+                '#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', 
+                '#ef4444', '#ec4899', '#14b8a6', '#f97316'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { position: 'right' }
+        }
+    }
+});
+</script>
+{% endblock %}
