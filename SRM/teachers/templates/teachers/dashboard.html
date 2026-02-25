@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Welcome, {{ teacher.user.get_full_name }}!</h2>
+            <p class="text-muted">
+                {{ teacher.employee_id }} | {{ teacher.designation }} | {{ teacher.department }}
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if teacher.photo %}
+                <img src="{{ teacher.photo.url }}" alt="Profile" 
+                     class="rounded-circle" width="80" height="80" style="object-fit: cover;">
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-2x mb-2"></i>
+                    <h6>Subjects Assigned</h6>
+                    <h2>{{ total_subjects }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h6>Total Students</h6>
+                    <h2>{{ total_students }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-2x mb-2"></i>
+                    <h6>Workload (Credits)</h6>
+                    <h2>{{ current_workload }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h6>Marks Entry Progress</h6>
+                    <h2>{{ marks_completion_percentage }}%</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="{% url 'teacher_marks_entry_subjects' %}" class="btn btn-primary w-100">
+                                <i class="fas fa-pencil-alt me-2"></i>Enter Marks
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'teacher_my_subjects' %}" class="btn btn-success w-100">
+                                <i class="fas fa-book-open me-2"></i>My Subjects
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'teacher_leave_apply' %}" class="btn btn-warning w-100">
+                                <i class="fas fa-calendar-alt me-2"></i>Apply Leave
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'teacher_my_timetable' %}" class="btn btn-info w-100">
+                                <i class="fas fa-clock me-2"></i>My Timetable
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Content Row -->
+    <div class="row g-4">
+        <!-- Assigned Subjects -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Assigned Subjects</h5>
+                </div>
+                <div class="card-body">
+                    {% if subjects %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Subject</th>
+                                        <th>Credits</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for subject in subjects %}
+                                    <tr>
+                                        <td><strong>{{ subject.code }}</strong></td>
+                                        <td>{{ subject.name }}</td>
+                                        <td>{{ subject.credits }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No subjects assigned yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Today's Schedule -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Today's Schedule</h5>
+                </div>
+                <div class="card-body">
+                    {% if today_schedule %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Subject</th>
+                                        <th>Room</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for entry in today_schedule %}
+                                    <tr>
+                                        <td>{{ entry.start_time|time:"g:i A" }} - {{ entry.end_time|time:"g:i A" }}</td>
+                                        <td>{{ entry.subject.code }}</td>
+                                        <td>{{ entry.room_number }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No classes scheduled for today.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Leave Applications -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Leave Applications</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_leaves %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Days</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for leave in recent_leaves %}
+                                    <tr>
+                                        <td>{{ leave.get_leave_type_display }}</td>
+                                        <td>{{ leave.start_date }}</td>
+                                        <td>{{ leave.end_date }}</td>
+                                        <td>{{ leave.total_days }}</td>
+                                        <td>
+                                            {% if leave.status == 'pending' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% elif leave.status == 'approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% elif leave.status == 'rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No leave applications.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+.stat-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+</style>
+{% endblock %}
