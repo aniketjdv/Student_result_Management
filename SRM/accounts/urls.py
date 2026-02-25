@@ -18,7 +18,7 @@ urlpatterns = [
     path('password-reset/<str:token>/', views.password_reset_confirm, name='password_reset_confirm'),
     
     # Admin Dashboard
-    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     
     # User Management (Admin only)
     path('users/', views.user_list, name='user_list'),
