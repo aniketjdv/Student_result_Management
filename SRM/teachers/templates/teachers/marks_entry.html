@@ -29,14 +29,14 @@
                 {% csrf_token %}
                 <div class="table-responsive">
                     <table class="table table-hover table-striped mb-0 align-middle">
-                        <thead class="bg-light">
+                       <thead class="bg-light">
                             <tr>
                                 <th class="ps-4 py-3" style="width: 5%;">#</th>
                                 <th class="py-3" style="width: 35%;">Student Details</th>
-                                <th class="py-3" style="width: 20%;">Enrollment No.</th>
-                                <th class="py-3" style="width: 20%;">Internal Marks</th>
-                                <th class="py-3" style="width: 20%;">External Marks</th>
-                            </tr>
+                                <th class="py-3" style="width: 15%;">Enrollment No.</th>
+                                <th class="py-3" style="width: 15%;">Internal Marks</th>
+                                <th class="py-3" style="width: 15%;">External Marks</th>
+                                <th class="py-3" style="width: 15%;">Attendance %</th> </tr>
                         </thead>
                         <tbody>
                             {% for data in marks_data %}
@@ -67,6 +67,17 @@
                                            value="{{ data.marks.external_marks|default:0 }}" 
                                            min="0" max="100" required>
                                 </td>
+                                <td class="pe-4">
+                                        <div class="input-group">
+                                            <input type="number" 
+                                                class="form-control" 
+                                                name="attendance_{{ data.student.id }}" 
+                                                value="{{ data.marks.attendance_percentage|default:0 }}" 
+                                                min="0" max="100" required>
+                                            <span class="input-group-text bg-light">%</span>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tr>
                             {% empty %}
                             <tr>
@@ -77,8 +88,9 @@
                                         <p class="mb-0">There are no active students enrolled in this program and semester yet.</p>
                                     </div>
                                 </td>
-                            </tr>
-                            {% endfor %}
+                            
+                                {% endfor %}
+                                
                         </tbody>
                     </table>
                 </div>

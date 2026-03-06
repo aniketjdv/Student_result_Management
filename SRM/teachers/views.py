@@ -718,7 +718,7 @@ def marks_entry(request, subject_id):
             # Get the marks from the submitted form (defaults to 0 if left blank)
             internal_marks = request.POST.get(f'internal_{student.id}', 0)
             external_marks = request.POST.get(f'external_{student.id}', 0)
-            
+            attendance = request.POST.get(f'attendance_{student.id}', 0)
             # Get or create the semester result record for this student
             sem_result, created = SemesterResult.objects.get_or_create(
                 student=student,
@@ -733,7 +733,8 @@ def marks_entry(request, subject_id):
                 defaults={
                     'teacher': teacher,
                     'internal_marks': int(internal_marks),
-                    'external_marks': int(external_marks)
+                    'external_marks': int(external_marks),
+                    'attendance_percentage': int(attendance)
                 }
             )
         

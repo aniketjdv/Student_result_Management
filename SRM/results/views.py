@@ -562,3 +562,19 @@ def get_performance_data_api(request, student_id):
     performance_data = get_student_performance_data(student)
     
     return JsonResponse(performance_data)
+
+
+@login_required
+@user_passes_test(is_student)
+def student_attendance_view(request):
+    student = request.user.student_profile
+    
+    # FIX: Changed 'marks__subject' to 'subject_marks__subject'
+    published_results = SemesterResult.objects.filter(
+        student=student, 
+        is_published=True
+    ).prefetch_related('subject_marks__subject')
+    
+    return render(request, 'results/student_attendance.html', {
+        'published_results': published_results
+    })
