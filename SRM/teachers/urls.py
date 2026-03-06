@@ -37,4 +37,8 @@ urlpatterns = [
     
     # API
     path('api/<int:teacher_id>/', views.get_teacher_data_api, name='teacher_data_api'),
+
+    path('marks-entry/', views.marks_entry_subject_list, name='marks_entry_subject_list'),
+    
+    # path('marks-entry/<int:subject_id>/', views.marks_entry, name='marks_entry'),
 ]

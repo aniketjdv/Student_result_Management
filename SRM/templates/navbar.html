@@ -19,6 +19,9 @@
                         <a class="nav-link" href="{% url 'student_list' %}">Students</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'teacher_list' %}">Teachers</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'program_list' %}">Programs</a>
                     </li>
                     <li class="nav-item">
@@ -34,6 +37,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'marks_entry_subject_list' %}">Marks Entry</a>
                     </li>
+                
                 {% elif user.is_student %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'student_dashboard' %}">Dashboard</a>

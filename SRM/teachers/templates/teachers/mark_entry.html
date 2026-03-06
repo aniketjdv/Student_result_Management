@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Enter Marks - {{ subject.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h2><i class="fas fa-edit text-primary me-2"></i>Enter Marks</h2>
+            <div class="d-flex flex-wrap gap-3 mt-2 text-muted">
+                <span><strong>Subject:</strong> {{ subject.name }} ({{ subject.code }})</span>
+                <span><i class="fas fa-circle" style="font-size: 6px; margin-top: 10px;"></i></span>
+                <span><strong>Program:</strong> {{ subject.program.name }}</span>
+                <span><i class="fas fa-circle" style="font-size: 6px; margin-top: 10px;"></i></span>
+                <span><strong>Semester:</strong> {{ subject.semester }}</span>
+            </div>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'marks_entry_subject_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Subjects
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-body p-0">
+            <form method="post">
+                {% csrf_token %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3" style="width: 5%;">#</th>
+                                <th class="py-3" style="width: 35%;">Student Details</th>
+                                <th class="py-3" style="width: 20%;">Enrollment No.</th>
+                                <th class="py-3" style="width: 20%;">Internal Marks</th>
+                                <th class="py-3" style="width: 20%;">External Marks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in marks_data %}
+                            <tr>
+                                <td class="ps-4 text-muted fw-bold">{{ forloop.counter }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-weight: bold;">
+                                            {{ data.student.user.first_name|first }}{{ data.student.user.last_name|first }}
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ data.student.user.get_full_name }}</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ data.student.enrollment_number }}</span></td>
+                                <td class="pe-3">
+                                    <input type="number" 
+                                           class="form-control" 
+                                           name="internal_{{ data.student.id }}" 
+                                           value="{{ data.marks.internal_marks|default:0 }}" 
+                                           min="0" max="100" required>
+                                </td>
+                                <td class="pe-4">
+                                    <input type="number" 
+                                           class="form-control" 
+                                           name="external_{{ data.student.id }}" 
+                                           value="{{ data.marks.external_marks|default:0 }}" 
+                                           min="0" max="100" required>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-user-graduate mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
+                                        <h5>No students found</h5>
+                                        <p class="mb-0">There are no active students enrolled in this program and semester yet.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if marks_data %}
+                <div class="card-footer bg-white py-3 px-4 d-flex justify-content-end border-top">
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                        <i class="fas fa-save me-2"></i>Save All Marks
+                    </button>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

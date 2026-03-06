@@ -684,3 +684,14 @@ def get_teacher_data_api(request, teacher_id):
     }
     
     return JsonResponse(data)
+
+@login_required
+@user_passes_test(is_teacher)
+def marks_entry_subject_list(request):
+    """Shows the list of subjects assigned to the teacher for marks entry"""
+    teacher = request.user.teacher_profile
+    subjects = teacher.subjects.all()
+    
+    return render(request, 'teachers/subject_list.html', {
+        'subjects': subjects
+    })

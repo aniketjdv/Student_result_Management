@@ -69,6 +69,7 @@
                         <div class="icon bg-info text-white me-3">
                             <i class="fas fa-book"></i>
                         </div>
+ 
                         <div>
                             <h6 class="text-muted mb-1">Subjects</h6>
                             <h3 class="mb-0">{{ total_subjects }}</h3>
@@ -80,7 +81,7 @@
     </div>
     
     <!-- Quick Actions -->
-    <div class="row mb-4">
+    <!-- <div class="row mb-4">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
@@ -105,6 +106,45 @@
                         </div>
                         <div class="col-md-3">
                             <a href="{% url 'publish_results' %}" class="btn btn-info w-100">
+                                <i class="fas fa-file-alt me-2"></i>Publish Results
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->/
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-2 col-sm-6">
+                            <a href="{% url 'student_add' %}" class="btn btn-primary w-100">
+                                <i class="fas fa-user-plus me-2"></i>Add Student
+                            </a>
+                        </div>
+                        <div class="col-md-2 col-sm-6">
+                            <a href="{% url 'teacher_add' %}" class="btn btn-secondary w-100">
+                                <i class="fas fa-chalkboard-teacher me-2"></i>Add Teacher
+                            </a>
+                        </div>
+                        <div class="col-md-2 col-sm-6">
+                            <a href="{% url 'program_add' %}" class="btn btn-success w-100">
+                                <i class="fas fa-plus me-2"></i>Add Program
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <a href="{% url 'subject_add' %}" class="btn btn-warning w-100">
+                                <i class="fas fa-book-open me-2"></i>Add Subject
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <a href="{% url 'publish_results' %}" class="btn btn-info w-100 text-white">
                                 <i class="fas fa-file-alt me-2"></i>Publish Results
                             </a>
                         </div>

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Subjects - Marks Entry{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-clipboard-list me-2"></i>Marks Entry</h2>
+            <p class="text-muted">Select a subject to enter or update student marks.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for subject in subjects %}
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-0" style="border-radius: 12px; overflow: hidden;">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">{{ subject.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted"><i class="fas fa-hashtag me-2"></i>Subject Code</span>
+                            <strong>{{ subject.code }}</strong>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted"><i class="fas fa-graduation-cap me-2"></i>Program</span>
+                            <strong>{{ subject.program.name }}</strong>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted"><i class="fas fa-layer-group me-2"></i>Semester</span>
+                            <strong>{{ subject.semester }}</strong>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white border-top-0 pb-3">
+                    <a href="{% url 'marks_entry' subject.id %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-edit me-2"></i>Enter Marks
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        {% empty %}
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-book-open text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h4>No Subjects Assigned</h4>
+                    <p class="text-muted mb-0">You have not been assigned to teach any subjects yet. Please contact the administrator.</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
