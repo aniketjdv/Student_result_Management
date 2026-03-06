@@ -636,3 +636,10 @@ def get_student_data_api(request, student_id):
     }
     
     return JsonResponse(data)
+
+def student_detail(request, pk):
+    # Fetch the student or return a 404 error if not found
+    student = get_object_or_404(Student, pk=pk)
+    
+    # Pass it to the template
+    return render(request, 'students/detail.html', {'student': student})

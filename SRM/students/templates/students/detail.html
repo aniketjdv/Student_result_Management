@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Details - {{ student.user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h2><i class="fas fa-user-graduate text-primary me-2"></i>Student Profile</h2>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>Go Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-4 p-md-5">
+                    
+                    <div class="row border-bottom pb-4 mb-4 text-center text-md-start align-items-center">
+                        <div class="col-md-3 mb-3 mb-md-0 d-flex justify-content-center justify-content-md-start">
+                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 100px; height: 100px; font-size: 3rem; font-weight: bold;">
+                                {{ student.user.first_name|first|default:student.user.username|first|upper }}
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <h3 class="fw-bold mb-1">{{ student.user.get_full_name|default:student.user.username }}</h3>
+                            <p class="text-muted mb-3 fs-5">
+                                <i class="fas fa-id-card me-2"></i>Enrollment No: <strong>{{ student.enrollment_number }}</strong>
+                            </p>
+                            
+                            <div class="d-flex gap-2 justify-content-center justify-content-md-start">
+                                {% if student.is_active %}
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 fs-6"><i class="fas fa-check-circle me-1"></i>Active Student</span>
+                                {% else %}
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 fs-6"><i class="fas fa-ban me-1"></i>Inactive</span>
+                                {% endif %}
+                                
+                                <span class="badge bg-info text-dark px-3 py-2 fs-6">
+                                    Sem {{ student.current_semester }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-5">
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase mb-1">Enrolled Program</label>
+                            <p class="mb-0 fw-medium fs-5 text-primary">{{ student.program.name }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase mb-1">Current Semester</label>
+                            <p class="mb-0 fw-medium fs-5">Semester {{ student.current_semester }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase mb-1">Email Address</label>
+                            <p class="mb-0 fw-medium"><i class="fas fa-envelope text-muted me-2"></i>{{ student.user.email|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase mb-1">Username</label>
+                            <p class="mb-0 fw-medium">@{{ student.user.username }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase mb-1">Date of Admission</label>
+                            <p class="mb-0 fw-medium"><i class="fas fa-calendar-alt text-muted me-2"></i>{{ student.user.date_joined|date:"F j, Y" }}</p>
+                        </div>
+                        
+                        {% if student.city %}
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase mb-1">City</label>
+                            <p class="mb-0 fw-medium"><i class="fas fa-map-marker-alt text-muted me-2"></i>{{ student.city }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-5 pt-4 border-top justify-content-end">
+                        <a href="{% url 'student_edit' student.pk %}" class="btn btn-primary px-4 shadow-sm">
+                            <i class="fas fa-edit me-2"></i>Edit Student Data
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}

@@ -8,8 +8,9 @@ class ProgramForm(forms.ModelForm):
         model = Program
         fields = ['name', 'duration_years', 'total_semesters', 'description', 'is_active']
         widgets = {
-            'name': forms.Select(attrs={
-                'class': 'form-select',
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter Program Name (e.g., MCA)',
                 'required': True
             }),
             'duration_years': forms.NumberInput(attrs={

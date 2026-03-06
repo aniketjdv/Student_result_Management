@@ -419,3 +419,10 @@ def register_view(request):
         form = UserRegistrationForm()
     
     return render(request, 'accounts/register.html', {'form': form})
+
+def user_detail(request, pk):
+    # Get the user to display
+    user_obj = get_object_or_404(User, pk=pk)
+    
+    # Pass 'user_obj' to the template
+    return render(request, 'accounts/user_detail.html', {'user_obj': user_obj})

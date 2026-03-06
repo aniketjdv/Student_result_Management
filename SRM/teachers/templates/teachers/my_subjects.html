@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Assigned Subjects{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h2><i class="fas fa-book-open text-primary me-2"></i>My Assigned Subjects</h2>
+            <p class="text-muted">Here are all the classes you are currently assigned to teach.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for subject in subjects %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-header bg-primary text-white pt-3 pb-2 border-0" style="border-radius: 1rem 1rem 0 0;">
+                    <h5 class="mb-0 fw-bold text-truncate" title="{{ subject.name }}">{{ subject.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush mb-0">
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-bottom-0 pb-2">
+                            <span class="text-muted small fw-bold text-uppercase"><i class="fas fa-hashtag me-2"></i>Subject Code</span>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary border px-2 py-1">{{ subject.code }}</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-bottom-0 pb-2">
+                            <span class="text-muted small fw-bold text-uppercase"><i class="fas fa-graduation-cap me-2"></i>Program</span>
+                            <span class="fw-medium text-dark">{{ subject.program.name }}</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-bottom-0">
+                            <span class="text-muted small fw-bold text-uppercase"><i class="fas fa-layer-group me-2"></i>Semester</span>
+                            <span class="badge bg-info text-dark px-2 py-1">Sem {{ subject.semester }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white border-top py-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'marks_entry' subject.id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i>Enter Marks
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-folder-open text-muted mb-3" style="font-size: 3.5rem; opacity: 0.4;"></i>
+                    <h4 class="fw-bold text-dark">No Subjects Assigned</h4>
+                    <p class="text-muted mb-0">You have not been assigned to teach any subjects yet. Please contact the system administrator if you believe this is a mistake.</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}

@@ -4,6 +4,17 @@ from .models import Teacher, TeacherLeave, TeacherDocument, TeacherAttendance, T
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
+    # Columns to show in the list view
+    list_display = ('employee_id', 'user', 'department', 'designation', 'is_active')
+    
+    # Fields you can search by
+    search_fields = ('employee_id', 'user__username', 'user__first_name', 'user__last_name', 'department')
+    
+    # Filters on the right sidebar
+    list_filter = ('department', 'is_active')
+    
+    # This creates a nice side-by-side selection widget for the subjects
+    filter_horizontal = ('subjects',)
     list_display = [
         'employee_id', 'get_full_name', 'department', 
         'designation', 'experience_years', 'is_active'

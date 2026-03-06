@@ -40,5 +40,5 @@ urlpatterns = [
 
     path('marks-entry/', views.marks_entry_subject_list, name='marks_entry_subject_list'),
     
-    # path('marks-entry/<int:subject_id>/', views.marks_entry, name='marks_entry'),
+    path('marks-entry/<int:subject_id>/', views.marks_entry, name='marks_entry'),
 ]

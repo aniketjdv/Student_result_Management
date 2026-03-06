@@ -42,7 +42,7 @@ class TeacherForm(forms.ModelForm):
             'date_of_birth', 'gender', 'blood_group', 'nationality',
             'photo', 'resume', 'research_interests', 'publications_count',
             'google_scholar_url', 'linkedin_url',
-            'is_hod', 'can_approve_results'
+            'is_hod', 'can_approve_results','subjects'
         ]
         widgets = {
             'employee_id': forms.TextInput(attrs={'class': 'form-control'}),
@@ -74,6 +74,7 @@ class TeacherForm(forms.ModelForm):
             'linkedin_url': forms.URLInput(attrs={'class': 'form-control'}),
             'is_hod': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'can_approve_results': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'subjects': forms.CheckboxSelectMultiple(),
         }
     
     def clean_employee_id(self):
@@ -134,7 +135,7 @@ class TeacherEditForm(forms.ModelForm):
             'date_of_birth', 'gender', 'blood_group', 'nationality',
             'photo', 'resume', 'research_interests', 'publications_count',
             'google_scholar_url', 'linkedin_url',
-            'is_active', 'is_hod', 'can_approve_results'
+            'is_active', 'is_hod', 'can_approve_results','subjects'
         ]
         widgets = {
             'employee_id': forms.TextInput(attrs={'class': 'form-control', 'readonly': True}),
@@ -167,6 +168,7 @@ class TeacherEditForm(forms.ModelForm):
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_hod': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'can_approve_results': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'subjects': forms.CheckboxSelectMultiple(),
         }
     
     def __init__(self, *args, **kwargs):

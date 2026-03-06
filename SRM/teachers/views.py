@@ -104,6 +104,7 @@ def teacher_add(request):
         form = TeacherForm(request.POST, request.FILES)
         if form.is_valid():
             teacher = form.save()
+            form.save_m2m()
             messages.success(request, f'Teacher {teacher.employee_id} added successfully!')
             return redirect('teacher_list')
         else:
@@ -130,6 +131,7 @@ def teacher_edit(request, pk):
         form = TeacherEditForm(request.POST, request.FILES, instance=teacher)
         if form.is_valid():
             teacher = form.save()
+            form.save_m2m()
             messages.success(request, f'Teacher {teacher.employee_id} updated successfully!')
             return redirect('teacher_detail', pk=teacher.pk)
         else:
@@ -221,7 +223,7 @@ def teacher_toggle_status(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
     teacher.is_active = not teacher.is_active
     teacher.save()
-    
+    form.save_m2m()
     status = "activated" if teacher.is_active else "deactivated"
     messages.success(request, f'Teacher {teacher.employee_id} {status} successfully!')
     
@@ -463,7 +465,7 @@ def teacher_profile_edit(request):
             teacher.photo = request.FILES['photo']
         
         teacher.save()
-        
+        form.save_m2m()
         # Update user info
         user = request.user
         user.phone = request.POST.get('phone', user.phone)
@@ -695,3 +697,85 @@ def marks_entry_subject_list(request):
     return render(request, 'teachers/subject_list.html', {
         'subjects': subjects
     })
+
+
+@login_required
+@user_passes_test(is_teacher)
+def marks_entry(request, subject_id):
+    """Handles the entry and saving of internal/external marks for a subject"""
+    teacher = request.user.teacher_profile
+    subject = get_object_or_404(Subject, pk=subject_id)
+    
+    # Get students enrolled in this subject's program and semester
+    students = Student.objects.filter(
+        program=subject.program,
+        current_semester=subject.semester,
+        is_active=True
+    )
+    
+    if request.method == 'POST':
+        for student in students:
+            # Get the marks from the submitted form (defaults to 0 if left blank)
+            internal_marks = request.POST.get(f'internal_{student.id}', 0)
+            external_marks = request.POST.get(f'external_{student.id}', 0)
+            
+            # Get or create the semester result record for this student
+            sem_result, created = SemesterResult.objects.get_or_create(
+                student=student,
+                semester=subject.semester,
+                defaults={'academic_year': '2024-25'} # Default academic year
+            )
+            
+            # Create or update the specific subject marks
+            SubjectMarks.objects.update_or_create(
+                semester_result=sem_result,
+                subject=subject,
+                defaults={
+                    'teacher': teacher,
+                    'internal_marks': int(internal_marks),
+                    'external_marks': int(external_marks)
+                }
+            )
+        
+        messages.success(request, f'Marks saved successfully for {subject.name}!')
+        return redirect('marks_entry_subject_list')
+    
+    # GET request: Load existing marks to display in the input boxes
+    marks_data = []
+    for student in students:
+        sem_result = SemesterResult.objects.filter(
+            student=student,
+            semester=subject.semester
+        ).first()
+        
+        marks = None
+        if sem_result:
+            marks = SubjectMarks.objects.filter(
+                semester_result=sem_result,
+                subject=subject
+            ).first()
+        
+        marks_data.append({
+            'student': student,
+            'marks': marks
+        })
+    
+    return render(request, 'teachers/marks_entry.html', {
+        'subject': subject,
+        'marks_data': marks_data
+    })
+
+def teacher_detail(request, pk):
+    teacher = get_object_or_404(Teacher, pk=pk)
+    return render(request, 'teachers/detail.html', {'teacher': teacher})
+
+@login_required
+@user_passes_test(is_teacher)
+def teacher_my_subjects(request):
+    # Get the logged-in teacher's profile
+    teacher = request.user.teacher_profile
+    
+    # Get all subjects assigned to this teacher
+    subjects = teacher.subjects.all()
+    
+    return render(request, 'teachers/my_subjects.html', {'subjects': subjects})

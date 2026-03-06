@@ -2,12 +2,8 @@
 from django.db import models
 
 class Program(models.Model):
-    PROGRAM_TYPES = (
-        ('MSc IT', 'MSc IT'),
-        ('MBA', 'MBA'),
-        ('MCA', 'MCA'),
-    )
-    name = models.CharField(max_length=50, choices=PROGRAM_TYPES, unique=True)
+    name = models.CharField(max_length=50, unique=True)
+    
     duration_years = models.IntegerField(default=2)
     total_semesters = models.IntegerField(default=4)
     description = models.TextField(blank=True)
