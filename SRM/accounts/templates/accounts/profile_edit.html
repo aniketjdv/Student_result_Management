@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-edit text-primary me-2"></i>Edit Profile</h2>
+                <a href="{% url 'profile' %}" class="btn btn-outline-secondary shadow-sm">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                </a>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-info-circle text-secondary me-2"></i>Update Personal Information
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <form method="POST" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger rounded-3 shadow-sm mb-4">
+                            <h6 class="alert-heading fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Please correct the errors below:</h6>
+                            <ul class="mb-0 mt-2 px-3">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li class="small fw-medium">{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li class="small fw-medium">{{ error }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <div class="custom-django-form mb-4">
+                            {{ form.as_p }}
+                        </div>
+                        
+                        <div class="d-flex justify-content-end pt-3 border-top gap-2">
+                            <a href="{% url 'profile' %}" class="btn btn-light px-4">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .custom-django-form p {
+        margin-bottom: 1.25rem;
+    }
+    .custom-django-form label {
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+        display: inline-block;
+        color: #495057;
+    }
+    .custom-django-form input[type="text"],
+    .custom-django-form input[type="email"],
+    .custom-django-form input[type="date"],
+    .custom-django-form textarea {
+        display: block;
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        font-size: 1rem;
+        color: #212529;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+    .custom-django-form input:focus,
+    .custom-django-form textarea:focus {
+        background-color: #fff;
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+    }
+    .custom-django-form input[type="file"] {
+        display: block;
+        width: 100%;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+        color: #212529;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+    }
+    .custom-django-form .helptext {
+        font-size: 0.85em;
+        color: #6c757d;
+        margin-top: 0.4rem;
+        display: block;
+    }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
