@@ -21,6 +21,7 @@ urlpatterns = [
     path('student/performance/', views.student_performance_analytics, name='student_performance'),
     path('student/attendance/', views.student_attendance_view, name='student_attendance'),
     
+    path('generate/', views.generate_results, name='generate_results'),
     # API
     path('api/performance/<int:student_id>/', views.get_performance_data_api, name='performance_data_api'),
 ]

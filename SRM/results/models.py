@@ -78,7 +78,6 @@ class SubjectMarks(models.Model):
     external_marks = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     attendance_percentage = models.IntegerField(default=0, help_text="Overall attendance percentage (0-100)")
     total_marks = models.IntegerField(default=0)
-    
     # Grade and performance
     grade = models.CharField(max_length=2, choices=GRADE_CHOICES, blank=True)
     grade_point = models.DecimalField(max_digits=3, decimal_places=1, default=0)

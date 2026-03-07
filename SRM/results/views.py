@@ -250,13 +250,14 @@ def teacher_marks_entry(request, subject_id):
         for student in students:
             internal_marks = request.POST.get(f'internal_{student.id}')
             external_marks = request.POST.get(f'external_{student.id}')
+            attendance_perc = request.POST.get(f'attendance_{student.id}', 0)
             remarks = request.POST.get(f'remarks_{student.id}', '')
             
             if internal_marks is not None and external_marks is not None:
                 try:
                     internal_marks = int(internal_marks)
                     external_marks = int(external_marks)
-                    
+                    attendance_perc = int(attendance_perc)
                     # Validate marks
                     if internal_marks < 0 or external_marks < 0:
                         error_count += 1
@@ -277,6 +278,7 @@ def teacher_marks_entry(request, subject_id):
                             'teacher': teacher,
                             'internal_marks': internal_marks,
                             'external_marks': external_marks,
+                            'attendance_percentage': attendance_perc,
                             'remarks': remarks
                         }
                     )
@@ -520,33 +522,33 @@ def student_performance_analytics(request):
     return render(request, 'results/performance_analytics.html', context)
 
 
-@login_required
-@user_passes_test(is_student)
-def student_attendance_view(request):
-    """View attendance records"""
-    student = request.user.student_profile
+# @login_required
+# @user_passes_test(is_student)
+# def student_attendance_view(request):
+#     """View attendance records"""
+#     student = request.user.student_profile
     
-    # Get current semester attendance
-    attendance_records = Attendance.objects.filter(
-        student=student,
-        semester=student.current_semester
-    ).select_related('subject')
+#     # Get current semester attendance
+#     attendance_records = Attendance.objects.filter(
+#         student=student,
+#         semester=student.current_semester
+#     ).select_related('subject')
     
-    # Calculate overall attendance
-    if attendance_records.exists():
-        total_classes = sum(att.total_classes for att in attendance_records)
-        attended_classes = sum(att.attended_classes for att in attendance_records)
-        overall_percentage = round((attended_classes / total_classes * 100), 2) if total_classes > 0 else 0
-    else:
-        overall_percentage = 0
+#     # Calculate overall attendance
+#     if attendance_records.exists():
+#         total_classes = sum(att.total_classes for att in attendance_records)
+#         attended_classes = sum(att.attended_classes for att in attendance_records)
+#         overall_percentage = round((attended_classes / total_classes * 100), 2) if total_classes > 0 else 0
+#     else:
+#         overall_percentage = 0
     
-    context = {
-        'student': student,
-        'attendance_records': attendance_records,
-        'overall_percentage': overall_percentage,
-    }
+#     context = {
+#         'student': student,
+#         'attendance_records': attendance_records,
+#         'overall_percentage': overall_percentage,
+#     }
     
-    return render(request, 'results/student_attendance.html', context)
+#     return render(request, 'results/student_attendance.html', context)
 
 
 # ============= API ENDPOINTS =============
@@ -567,14 +569,28 @@ def get_performance_data_api(request, student_id):
 @login_required
 @user_passes_test(is_student)
 def student_attendance_view(request):
+    """View attendance records from published semester results"""
     student = request.user.student_profile
     
-    # FIX: Changed 'marks__subject' to 'subject_marks__subject'
+    # Fetch published results so the student can see their attendance
     published_results = SemesterResult.objects.filter(
         student=student, 
         is_published=True
-    ).prefetch_related('subject_marks__subject')
+    ).prefetch_related('subject_marks__subject').order_by('-semester')
     
-    return render(request, 'results/student_attendance.html', {
-        'published_results': published_results
-    })
+    context = {
+        'student': student,
+        'published_results': published_results,
+    }
+    
+    return render(request, 'results/student_attendance.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def generate_results(request):
+    """
+    Since SGPA and CGPA are automatically calculated during the 
+    'Publish' step, we can just redirect the admin there.
+    """
+    messages.info(request, "Note: SGPA and CGPA are automatically calculated when you Publish the results!")
+    return redirect('publish_results')

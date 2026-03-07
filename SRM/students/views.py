@@ -433,6 +433,49 @@ def student_fee_payment(request, pk):
 
 # ============= STUDENT DASHBOARD & PROFILE =============
 
+# @login_required
+# @user_passes_test(is_student)
+# def student_dashboard(request):
+#     """Student dashboard"""
+#     student = request.user.student_profile
+    
+#     # Get latest semester result
+#     latest_result = SemesterResult.objects.filter(
+#         student=student,
+#         is_published=True
+#     ).order_by('-semester').first()
+    
+#     # Get attendance
+#     from results.models import Attendance
+#     attendance_records = Attendance.objects.filter(
+#         student=student,
+#         semester=student.current_semester
+#     )
+    
+#     overall_attendance = student.get_attendance_percentage()
+    
+#     # Get fee status
+#     pending_fees = StudentFee.objects.filter(
+#         student=student,
+#         payment_status__in=['pending', 'partial', 'overdue']
+#     ).count()
+    
+#     # Statistics
+#     cgpa = calculate_cgpa(student)
+#     total_credits = student.total_credits_earned
+    
+#     context = {
+#         'student': student,
+#         'latest_result': latest_result,
+#         'cgpa': cgpa,
+#         'current_sgpa': student.current_semester_sgpa,
+#         'total_credits': total_credits,
+#         'overall_attendance': overall_attendance,
+#         'attendance_records': attendance_records,
+#         'pending_fees': pending_fees,
+#     }
+    
+#     return render(request, 'students/dashboard.html', context)
 @login_required
 @user_passes_test(is_student)
 def student_dashboard(request):
@@ -445,14 +488,21 @@ def student_dashboard(request):
         is_published=True
     ).order_by('-semester').first()
     
-    # Get attendance
-    from results.models import Attendance
-    attendance_records = Attendance.objects.filter(
-        student=student,
-        semester=student.current_semester
-    )
+    # --- UPDATED ATTENDANCE LOGIC ---
+    # Grab the attendance from the SubjectMarks of the latest published result
+    attendance_records = []
+    overall_attendance = 0
     
-    overall_attendance = student.get_attendance_percentage()
+    if latest_result:
+        attendance_records = latest_result.subject_marks.all()
+        
+        # Calculate overall percentage by averaging the attendance of all subjects
+        total_pct = sum(mark.attendance_percentage for mark in attendance_records)
+        subject_count = attendance_records.count()
+        
+        if subject_count > 0:
+            overall_attendance = round(total_pct / subject_count, 2)
+    # --------------------------------
     
     # Get fee status
     pending_fees = StudentFee.objects.filter(
@@ -468,7 +518,7 @@ def student_dashboard(request):
         'student': student,
         'latest_result': latest_result,
         'cgpa': cgpa,
-        'current_sgpa': student.current_semester_sgpa,
+        'current_sgpa': latest_result.sgpa if latest_result else 0, # Safer way to get SGPA
         'total_credits': total_credits,
         'overall_attendance': overall_attendance,
         'attendance_records': attendance_records,
@@ -476,7 +526,6 @@ def student_dashboard(request):
     }
     
     return render(request, 'students/dashboard.html', context)
-
 
 @login_required
 @user_passes_test(is_student)

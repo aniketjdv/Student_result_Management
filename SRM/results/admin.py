@@ -25,7 +25,7 @@ class SemesterResultAdmin(admin.ModelAdmin):
 
 @admin.register(SubjectMarks)
 class SubjectMarksAdmin(admin.ModelAdmin):
-    list_display = ['semester_result', 'subject', 'internal_marks', 'external_marks', 'total_marks', 'grade', 'is_passed']
+    list_display = ['semester_result', 'subject', 'internal_marks', 'external_marks', 'total_marks', 'grade', 'is_passed','attendance_percentage']
     list_filter = ['grade', 'is_passed', 'subject__program', 'semester_result__semester']
     search_fields = [
         'semester_result__student__enrollment_number',

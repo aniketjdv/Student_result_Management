@@ -66,11 +66,106 @@ def calculate_cgpa(student):
     return round(cgpa, 2)
 
 
+# def get_student_performance_data(student):
+#     """
+#     Get comprehensive performance data for charts and analytics
+#     """
+#     from results.models import SemesterResult, Attendance
+    
+#     # Semester-wise SGPA data
+#     semester_results = SemesterResult.objects.filter(
+#         student=student,
+#         is_published=True
+#     ).order_by('semester')
+    
+#     sgpa_data = [
+#         {
+#             'semester': f'Sem {sr.semester}',
+#             'sgpa': float(sr.sgpa) if sr.sgpa else 0,
+#             'percentage': float(sr.percentage)
+#         }
+#         for sr in semester_results
+#     ]
+    
+#     # Subject-wise performance (current semester)
+#     current_sem_result = semester_results.filter(
+#         semester=student.current_semester
+#     ).first()
+    
+#     subject_performance = []
+#     if current_sem_result:
+#         for mark in current_sem_result.subject_marks.all():
+#             subject_performance.append({
+#                 'subject': mark.subject.code,
+#                 'subject_name': mark.subject.name,
+#                 'marks': mark.total_marks,
+#                 'max_marks': mark.subject.max_marks,
+#                 'percentage': mark.percentage,
+#                 'grade': mark.grade,
+#                 'grade_point': float(mark.grade_point)
+#             })
+    
+#     # Attendance data
+#     attendance_records = Attendance.objects.filter(
+#         student=student,
+#         semester=student.current_semester
+#     )
+    
+#     attendance_data = [
+#         {
+#             'subject': att.subject.code,
+#             'subject_name': att.subject.name,
+#             'percentage': float(att.percentage),
+#             'attended': att.attended_classes,
+#             'total': att.total_classes,
+#             'status': att.status
+#         }
+#         for att in attendance_records
+#     ]
+    
+#     # Grade distribution across all semesters
+#     from django.db.models import Count
+    
+#     grade_distribution = SubjectMarks.objects.filter(
+#         semester_result__student=student,
+#         semester_result__is_published=True
+#     ).values('grade').annotate(count=Count('grade')).order_by('grade')
+    
+#     # Performance summary
+#     cgpa = calculate_cgpa(student)
+#     total_subjects = SubjectMarks.objects.filter(
+#         semester_result__student=student,
+#         semester_result__is_published=True
+#     ).count()
+    
+#     passed_subjects = SubjectMarks.objects.filter(
+#         semester_result__student=student,
+#         semester_result__is_published=True,
+#         is_passed=True
+#     ).count()
+    
+#     failed_subjects = total_subjects - passed_subjects
+    
+#     return {
+#         'sgpa_data': sgpa_data,
+#         'subject_performance': subject_performance,
+#         'attendance_data': attendance_data,
+#         'grade_distribution': list(grade_distribution),
+#         'cgpa': float(cgpa),
+#         'summary': {
+#             'total_subjects': total_subjects,
+#             'passed_subjects': passed_subjects,
+#             'failed_subjects': failed_subjects,
+#             'pass_percentage': round((passed_subjects / total_subjects * 100), 2) if total_subjects > 0 else 0
+#         }
+#     }
+
 def get_student_performance_data(student):
     """
     Get comprehensive performance data for charts and analytics
     """
-    from results.models import SemesterResult, Attendance
+    from results.models import SemesterResult, SubjectMarks
+    from django.db.models import Count
     
     # Semester-wise SGPA data
     semester_results = SemesterResult.objects.filter(
@@ -87,45 +182,33 @@ def get_student_performance_data(student):
         for sr in semester_results
     ]
     
-    # Subject-wise performance (current semester)
-    current_sem_result = semester_results.filter(
-        semester=student.current_semester
-    ).first()
+    # Get the latest published result for the Subject and Attendance charts
+    latest_result = semester_results.last()
     
     subject_performance = []
-    if current_sem_result:
-        for mark in current_sem_result.subject_marks.all():
+    attendance_data = []
+    
+    if latest_result:
+        for mark in latest_result.subject_marks.all():
+            # 1. Populate Subject Performance Chart Data
             subject_performance.append({
                 'subject': mark.subject.code,
                 'subject_name': mark.subject.name,
                 'marks': mark.total_marks,
                 'max_marks': mark.subject.max_marks,
-                'percentage': mark.percentage,
+                'percentage': float(mark.percentage),
                 'grade': mark.grade,
                 'grade_point': float(mark.grade_point)
             })
-    
-    # Attendance data
-    attendance_records = Attendance.objects.filter(
-        student=student,
-        semester=student.current_semester
-    )
-    
-    attendance_data = [
-        {
-            'subject': att.subject.code,
-            'subject_name': att.subject.name,
-            'percentage': float(att.percentage),
-            'attended': att.attended_classes,
-            'total': att.total_classes,
-            'status': att.status
-        }
-        for att in attendance_records
-    ]
+            
+            # 2. Populate Attendance Chart Data (Using our new Option 1 approach!)
+            attendance_data.append({
+                'subject': mark.subject.code,
+                'subject_name': mark.subject.name,
+                'percentage': float(mark.attendance_percentage) if mark.attendance_percentage else 0,
+            })
     
     # Grade distribution across all semesters
-    from django.db.models import Count
-    
     grade_distribution = SubjectMarks.objects.filter(
         semester_result__student=student,
         semester_result__is_published=True
@@ -159,8 +242,6 @@ def get_student_performance_data(student):
             'pass_percentage': round((passed_subjects / total_subjects * 100), 2) if total_subjects > 0 else 0
         }
     }
-
-
 def get_class_performance_summary(program, semester, academic_year):
     """
     Get class performance summary for teachers/admin

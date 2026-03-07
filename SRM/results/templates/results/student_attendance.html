@@ -39,7 +39,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for mark in result.marks.all %}
+                                {% for mark in result.subject_marks.all %}
                                 <tr>
                                     <td class="ps-4 fw-medium text-dark">{{ mark.subject.name }}</td>
                                     <td><span class="badge bg-secondary bg-opacity-10 text-secondary border">{{ mark.subject.code }}</span></td>
